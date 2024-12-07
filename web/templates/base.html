@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel = 'stylesheet' href = "{% static 'style/style.css' %}">
+    
+    <title>가성비 있는, 한잔의 커피!</title>
+</head>
+<body>
+    <div class = 'header'>
+        <div class = 'header_1'>
+        </div>
+        
+        <div class = 'header_2'>
+            <img src = "{% static 'img/logo.png' %}" id = 'logo'>
+            가성비 있는 커피
+        </div>
+
+        <div class = 'header_3'>
+        </div>
+    </div>
+    <div class = 'main'>
+        <div class = 'main_header'>
+            <div class = 'main_header_1'>
+                <button class = 'btn' type = 'submit'>test</button>
+            </div>
+            <div class = 'main_header_2'>
+                <button class = 'btn' type = 'submit'>test</button>
+            </div>
+            <div class = 'main_header_3'>
+                <button class = 'btn' type = 'submit'>test</button>
+            </div>
+        </div>
+        <div class = 'main_body'>
+            <div id = 'kakao_map'></div>
+            <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_Key }}"></script>
+            <script>
+                var container = document.getElementById('kakao_map');
+                var options = {
+                    center: new kakao.maps.LatLng(33.450701, 126.570667),
+                    level: 3
+                };
+                var map = new kakao.maps.Map(container, options);
+            </script>      
+            
+        </div>
+    </div>
+</body>
+</html>
