@@ -30,19 +30,176 @@
                 <button class = 'btn' type = 'submit'>test</button>
             </div>
             <div class = 'main_header_3'>
-                <button class = 'btn' type = 'submit'>test</button>
+                 <button class = 'btn' type = 'submit'>test</button>
             </div>
         </div>
         <div class = 'main_body'>
+            <!-- 참고 사이트
+            https://apis.map.kakao.com/web/sample/basicMap/ -->
             <div id = 'kakao_map'></div>
-            <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_Key }}"></script>
+            <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_Key }}&libraries=services,clusterer,drawing,geometry"></script>
             <script>
                 var container = document.getElementById('kakao_map');
                 var options = {
                     center: new kakao.maps.LatLng(33.450701, 126.570667),
-                    level: 3
+                    level: 4
                 };
                 var map = new kakao.maps.Map(container, options);
+                
+                // 원 그리기
+                var circle = new kakao.maps.Circle({
+                    center : options.center,
+                    radius : 500,
+                    strokeWeight : 2,
+                    strokeColor : '#FFAE00',
+                    strokeOpacity : 0.8,
+                    strokeStyle : 'solid',
+                    fillColor : '#FFCF00',
+                    fillOpacity : 0.7
+                });
+
+                var circleCenter = circle.getPosition();
+                var circleRadius = circle.getRadius();
+
+
+                //확대 축소 제어 컨트롤
+                var zoomControl = new kakao.maps.ZoomControl();
+                map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT)
+
+
+                function setCenter(){
+                    //이동할 위도 경도 위치를 생성함
+                    var moveLatLon = new Kakao.maps.LatLng(33,127);
+
+                    //지도 중심으로 이동함
+                    map.setCenter(moveLatLon)
+                }
+
+                function panTo(){
+                    //이동할 위도 경도 위치를 생성함
+                    var moveLatlon = new kakao.maps.LatLng(37, 128);
+
+                    //지도 중심을 부드럽게 이동함, 만약 이동할 거리가 지도 화면보다 크면, 부드러운 효과 없음
+                    map.panTo(moveLatLon)
+                }
+
+                // 현재 위치 찾는건 나중에 다시 해보자
+                // // HTML5의 geolocation으로 현재 위치(위경도) 사용할 수 있는 지 확인
+                // if (navigator.geolocation){
+                //     // geolocation을 이용해서 접속 위치를 얻기
+                //     navigator.geolocation.getCurrentPostion(function(position){
+
+                //          // 위도
+                //         var lat = position.coords.latitude,
+                //             lon = position.coords.longitude;
+                        
+                //         // 마커 표시될 위치
+                //         var locPosition = new kakao.maps.LatLng(lat, lon)
+
+                //         displayMarker(locPosition)
+
+                //     });
+                // } else {
+                //     var locPostion = new kakao.maps.LatLng(33, 126),
+                //         message = '현재 위치가 조금 이상하네요'
+
+                //     displayMarker(locPosition, message)
+
+                // }
+
+
+                //마커 표시 위치
+                var markerPosition = new kakao.maps.LatLng(33.450701,126.570667)
+
+                //마커 생성
+                var marker = new kakao.maps.Marker({
+                    position : markerPosition
+                });
+                
+                
+                // 이미지 마커 생성하기
+                var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+                    imageSize = new kakao.maps.Size(64,69);
+                    // 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정함
+                    // imageOption = {offset : new kakao.maps.Point(27,69)};
+
+
+
+                // 마커를 표시할 위치와 title 객체 배열
+                var positions = [
+                    {
+                        title: 'kakao',
+                        latlng: new kakao.maps.LatLng(33.451701, 126.777667)
+                    },
+                
+                    {
+                        title: '생태 연못',
+                        latlng: new kakao.maps.LatLng(33.451701, 126.572667)
+                    },
+                
+                    {
+                        title: '근린공원',
+                        latlng: new kakao.maps.LatLng(33, 124)
+                    }
+                
+                ]
+                // 원의 중심 좌표 및 반경
+                var centerLat = options.center.getLat();
+                var centerLng = options.center.getLng();
+                var circleRadius = circle.getRadius(); // 반경 (미터 단위)
+                function getDistance(lat1, lng1, lat2, lng2) {
+                    var R = 6371e3; // 지구의 반지름 (미터)
+                    var rad = Math.PI / 180; // 라디안 변환
+                    var dLat = (lat2 - lat1) * rad;
+                    var dLng = (lng2 - lng1) * rad;
+                    var a =
+                        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+                    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    return R * c; // 거리 (미터)
+                }
+
+                for (var i = 0; i < positions.length; i++) {
+                    var lat = positions[i].latlng.getLat();
+                    var lng = positions[i].latlng.getLng();
+                    var distance = getDistance(centerLat, centerLng, lat, lng);
+                    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+                    if (distance <= circleRadius) {
+                        var marker = new kakao.maps.Marker({
+                            map: map,
+                            position: positions[i].latlng,
+                            title: positions[i].title,
+                            image : markerImage
+                        });
+                    }
+                };
+
+                // for (var i = 0; i < positions.length; i ++){
+                //     // 마커의 이미지 정보를 가지고 있는 마커이미지를 생성함
+                //     var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+                //     // markerPosition = new kakao.maps.LatLng(33.450701,126.570667);
+
+                //     // 마커를 생성함
+                //     var marker_cafes = new kakao.maps.Marker({
+                //         map:map,
+                //         position : positions[i].latlng,
+                //         title : positions[i].title,
+                //         image : markerImage
+                //     });
+
+                // }
+                
+
+                marker.setMap(map);
+                circle.setMap(map);
+                marker_cafes.setMap(map);
+
+
+
+
+
+
             </script>      
             
         </div>

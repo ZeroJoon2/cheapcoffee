@@ -34,6 +34,9 @@ html {
 
 .main_body{
     margin-top: 2vh;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
 }
 
 
@@ -44,5 +47,7 @@ html {
 }
 
 #kakao_map{
-    width: 10vw;
+    width: 100%;
+    height: 60vh;
+    
 }
