@@ -56,6 +56,14 @@
 
                 // });
                 
+
+                var container = document.getElementById('kakao_map');
+                var options = {
+                    center: new kakao.maps.LatLng(37.77398268970647, 128.15070074003404),
+                    level: 4
+                };
+                var map = new kakao.maps.Map(container, options);
+
                 // HTML5 Geolocation API를 사용하여 현재 위치를 가져오기
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
@@ -80,7 +88,20 @@
                                 content: '<div style="padding:5px;">현재 위치</div>'
                             });
                             infoWindow.open(map, marker);
+
+                            var circle = new kakao.maps.Circle({
+                                center : locPosition,
+                                radius : 500,
+                                strokeWeight : 2,
+                                strokeColor : '#FFAE00',
+                                strokeOpacity : 0.8,
+                                strokeStyle : 'solid',
+                                fillColor : '#FFCF00',
+                                fillOpacity : 0.5
+                            });
+                            circle.setMap(map);
                         },
+                        
                         function (error) {
                             console.error("Error occurred while retrieving location: ", error.message);
                             alert("위치 정보를 가져올 수 없습니다.");
@@ -95,13 +116,30 @@
                     alert("이 브라우저에서는 Geolocation API를 지원하지 않습니다.");
                 }
 
-                var container = document.getElementById('kakao_map');
-                var options = {
-                    center: new kakao.maps.LatLng(33.450701, 126.570667),
-                    level: 4
-                };
-                var map = new kakao.maps.Map(container, options);
-                
+                //확대 축소 제어 컨트롤
+                var zoomControl = new kakao.maps.ZoomControl();
+                map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT)
+
+                function setCenter(){
+                    //이동할 위도 경도 위치를 생성함
+                    var moveLatLon = new Kakao.maps.LatLng(lat,lon);
+
+                    //지도 중심으로 이동함
+                    map.setCenter(moveLatLon)
+                }
+
+                function panTo(){
+                    //이동할 위도 경도 위치를 생성함
+                    var moveLatlon = new kakao.maps.LatLng(lat, lon);
+
+                    //지도 중심을 부드럽게 이동함, 만약 이동할 거리가 지도 화면보다 크면, 부드러운 효과 없음
+                    map.panTo(moveLatLon)
+                }
+                // var options = {
+                //     center: new kakao.maps.LatLng(lat, lon),
+                //     level: 4
+                // };
+
                 // 원 그리기
                 var circle = new kakao.maps.Circle({
                     center : options.center,
@@ -116,30 +154,6 @@
 
                 var circleCenter = circle.getPosition();
                 var circleRadius = circle.getRadius();
-
-
-                //확대 축소 제어 컨트롤
-                var zoomControl = new kakao.maps.ZoomControl();
-                map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT)
-
-
-                function setCenter(){
-                    //이동할 위도 경도 위치를 생성함
-                    var moveLatLon = new Kakao.maps.LatLng(33,127);
-
-                    //지도 중심으로 이동함
-                    map.setCenter(moveLatLon)
-                }
-
-                function panTo(){
-                    //이동할 위도 경도 위치를 생성함
-                    var moveLatlon = new kakao.maps.LatLng(37, 128);
-
-                    //지도 중심을 부드럽게 이동함, 만약 이동할 거리가 지도 화면보다 크면, 부드러운 효과 없음
-                    map.panTo(moveLatLon)
-                }
-
-
 
                 //마커 표시 위치
                 var markerPosition = new kakao.maps.LatLng(31.650701,126.570667)
@@ -162,17 +176,17 @@
                 var positions = [
                     {
                         title: 'kakao',
-                        latlng: new kakao.maps.LatLng(33.451701, 126.777667)
+                        latlng: new kakao.maps.LatLng(37.57703896282699, 126.89692592469895)
                     },
                 
                     {
                         title: '생태 연못',
-                        latlng: new kakao.maps.LatLng(33.451701, 126.572667)
+                        latlng: new kakao.maps.LatLng(37.57703896282699, 126.89692592469895)
                     },
                 
                     {
                         title: '근린공원',
-                        latlng: new kakao.maps.LatLng(33, 124)
+                        latlng: new kakao.maps.LatLng(37.57703896282699, 126.89692592469895)
                     }
                 
                 ]
@@ -208,25 +222,25 @@
                     }
                 };
 
-                // for (var i = 0; i < positions.length; i ++){
-                //     // 마커의 이미지 정보를 가지고 있는 마커이미지를 생성함
-                //     var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
-                //     // markerPosition = new kakao.maps.LatLng(33.450701,126.570667);
+                for (var i = 0; i < positions.length; i ++){
+                    // 마커의 이미지 정보를 가지고 있는 마커이미지를 생성함
+                    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+                    // markerPosition = new kakao.maps.LatLng(33.450701,126.570667);
 
-                //     // 마커를 생성함
-                //     var marker_cafes = new kakao.maps.Marker({
-                //         map:map,
-                //         position : positions[i].latlng,
-                //         title : positions[i].title,
-                //         image : markerImage
-                //     });
+                    // 마커를 생성함
+                    var marker_cafes = new kakao.maps.Marker({
+                        map:map,
+                        position : positions[i].latlng,
+                        title : positions[i].title,
+                        image : markerImage
+                    });
 
-                // }
+                }
                 
 
-                marker.setMap(map);
-                circle.setMap(map);
-                marker_cafes.setMap(map);
+                // marker.setMap(map);
+                // circle.setMap(map);
+                // marker_cafes.setMap(map);
 
 
 
